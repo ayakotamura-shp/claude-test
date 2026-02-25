@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>占いアプリ</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 40px;
+            max-width: 500px;
+            width: 100%;
+            text-align: center;
+        }
+
+        h1 {
+            color: #764ba2;
+            margin-bottom: 10px;
+            font-size: 32px;
+        }
+
+        .subtitle {
+            color: #999;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+
+        .fortune-display {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 15px;
+            min-height: 120px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 30px 0;
+            font-size: 18px;
+            line-height: 1.6;
+            font-weight: bold;
+        }
+
+        .fortune-display.hidden {
+            display: none;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        button {
+            padding: 12px 20px;
+            font-size: 14px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+        }
+
+        .btn-fortune {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            flex: 1;
+            min-width: 150px;
+            padding: 15px;
+            font-size: 16px;
+        }
+
+        .btn-fortune:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-fortune:active {
+            transform: translateY(0);
+        }
+
+        .category-btn {
+            background: #f0f0f0;
+            color: #333;
+            padding: 10px 15px;
+            font-size: 12px;
+        }
+
+        .category-btn:hover {
+            background: #e0e0e0;
+        }
+
+        .category-btn.active {
+            background: #764ba2;
+            color: white;
+        }
+
+        .emoji {
+            font-size: 50px;
+            margin-bottom: 10px;
+        }
+
+        .luck-level {
+            display: flex;
+            justify-content: center;
+            gap: 5px;
+            margin-top: 10px;
+        }
+
+        .star {
+            font-size: 20px;
+            color: #ffd700;
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 25px;
+            }
+
+            h1 {
+                font-size: 24px;
+            }
+
+            .fortune-display {
+                font-size: 16px;
+                padding: 20px;
+                min-height: 100px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>✨ 占いアプリ ✨</h1>
+        <p class="subtitle">今日の運勢を占ってみましょう</p>
+
+        <div class="button-group">
+            <button class="category-btn active" data-category="all">全て</button>
+            <button class="category-btn" data-category="love">恋愛</button>
+            <button class="category-btn" data-category="work">仕事</button>
+            <button class="category-btn" data-category="health">健康</button>
+            <button class="category-btn" data-category="money">金運</button>
+        </div>
+
+        <div class="fortune-display hidden">
+            <div>
+                <div class="emoji" id="emoji">🔮</div>
+                <div id="fortune-text"></div>
+                <div class="luck-level" id="luck-level"></div>
+            </div>
+        </div>
+
+        <button class="btn-fortune">占う</button>
+    </div>
+
+    <script>
+        const fortunes = {
+            all: [
+                { text: '大吉\n素晴らしい日になるでしょう。すべてがうまくいく予感です。', emoji: '🌟', luck: 5 },
+                { text: '中吉\n運が味方しています。新しいチャレンジを始めるのに良い日です。', emoji: '✨', luck: 4 },
+                { text: '小吉\n悪くない日です。地道に頑張れば報われるでしょう。', emoji: '🌙', luck: 3 },
+                { text: '末吉\n少し工夫が必要ですが、工夫次第で運が開きます。', emoji: '⭐', luck: 2 },
+                { text: '凶\n今日は慎重に行動しましょう。焦らず落ち着くことが大切です。', emoji: '☁️', luck: 1 }
+            ],
+            love: [
+                { text: '恋愛大吉\n素敵な出会いや恋愛成就の予感！告白にも良い日です。', emoji: '💕', luck: 5 },
+                { text: '恋愛中吉\n相手のことを思いやる心が報われる日。好感度アップ！', emoji: '💗', luck: 4 },
+                { text: '恋愛小吉\nじっくり関係を深めるのに良い日。焦らず進めましょう。', emoji: '💞', luck: 3 },
+                { text: '恋愛末吉\nコミュニケーションが大切。相手の話をよく聞きましょう。', emoji: '💘', luck: 2 },
+                { text: '恋愛凶\nいったん立ち止まる時期。自分磨きに時間を使いましょう。', emoji: '😔', luck: 1 }
+            ],
+            work: [
+                { text: '仕事大吉\nプロジェクト成功の時期到来！大きなチャンスが来ています。', emoji: '🚀', luck: 5 },
+                { text: '仕事中吉\n努力が報われる日。信頼を集めるのに良い日です。', emoji: '💼', luck: 4 },
+                { text: '仕事小吉\nコツコツと進めることが大事。着実な進歩があります。', emoji: '📈', luck: 3 },
+                { text: '仕事末吉\nチームワークを大切に。協力者の力を借りましょう。', emoji: '🤝', luck: 2 },
+                { text: '仕事凶\n準備と計画が大事な時期。焦らず基礎を固めましょう。', emoji: '⚠️', luck: 1 }
+            ],
+            health: [
+                { text: '健康大吉\n体調絶好調！積極的に運動や新しいことに挑戦しましょう。', emoji: '💪', luck: 5 },
+                { text: '健康中吉\n元気いっぱいの日。バランスの良い生活を心がけましょう。', emoji: '🏃', luck: 4 },
+                { text: '健康小吉\n適度な運動が効果的。無理のない範囲で動きましょう。', emoji: '🧘', luck: 3 },
+                { text: '健康末吉\nゆっくり休むことも大切。十分な睡眠を心がけましょう。', emoji: '😴', luck: 2 },
+                { text: '健康凶\n今日は無理をしないで。ゆったり過ごしることが重要です。', emoji: '🤒', luck: 1 }
+            ],
+            money: [
+                { text: '金運大吉\n臨時収入の予感！投資や新しい事業にも良い時期です。', emoji: '💰', luck: 5 },
+                { text: '金運中吉\n着実に貯蓄が増える日。節約も効果的です。', emoji: '💵', luck: 4 },
+                { text: '金運小吉\n無駄な出費を避ければ、金銭運がアップします。', emoji: '💳', luck: 3 },
+                { text: '金運末吉\n大きな出費は避けた方が無難。計画的に使いましょう。', emoji: '💸', luck: 2 },
+                { text: '金運凶\n浪費に要注意。貯蓄に回す日です。', emoji: '📉', luck: 1 }
+            ]
+        };
+
+        let currentCategory = 'all';
+        const fortuneDisplay = document.querySelector('.fortune-display');
+        const fortuneText = document.getElementById('fortune-text');
+        const emojiDisplay = document.getElementById('emoji');
+        const luckLevel = document.getElementById('luck-level');
+        const fortuneButton = document.querySelector('.btn-fortune');
+        const categoryButtons = document.querySelectorAll('.category-btn');
+
+        // カテゴリーボタンのイベントリスナー
+        categoryButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                categoryButtons.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                currentCategory = btn.dataset.category;
+                fortuneDisplay.classList.add('hidden');
+            });
+        });
+
+        // 占うボタンのイベントリスナー
+        fortuneButton.addEventListener('click', () => {
+            const fortunes_list = fortunes[currentCategory];
+            const randomIndex = Math.floor(Math.random() * fortunes_list.length);
+            const fortune = fortunes_list[randomIndex];
+
+            emojiDisplay.textContent = fortune.emoji;
+            fortuneText.textContent = fortune.text;
+
+            // ラッキースター表示
+            luckLevel.innerHTML = '';
+            for (let i = 0; i < fortune.luck; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                star.textContent = '⭐';
+                luckLevel.appendChild(star);
+            }
+
+            fortuneDisplay.classList.remove('hidden');
+
+            // アニメーション効果
+            fortuneDisplay.style.animation = 'none';
+            setTimeout(() => {
+                fortuneDisplay.style.animation = 'fadeIn 0.5s ease-in-out';
+            }, 10);
+        });
+
+        // アニメーション定義
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes fadeIn {
+                from {
+                    opacity: 0;
+                    transform: scale(0.95);
+                }
+                to {
+                    opacity: 1;
+                    transform: scale(1);
+                }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>
