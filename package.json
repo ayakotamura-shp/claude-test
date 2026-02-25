@@ -1,0 +1,9 @@
+{
+  "name": "fortune-app-tests",
+  "version": "1.0.0",
+  "description": "Test suite for fortune telling app",
+  "scripts": {
+    "test": "node tests/run-tests.js"
+  },
+  "devDependencies": {}
+}
