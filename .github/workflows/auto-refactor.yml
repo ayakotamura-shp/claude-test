@@ -1,6 +1,11 @@
 name: Auto Refactor - Cleanup PR Generator
 
 on:
+  push:
+    branches:
+      - main
+      - master
+      - 'claude/**'
   schedule:
     # 毎日 UTC 15:00 (JST 00:00) に実行
     - cron: '0 15 * * *'
