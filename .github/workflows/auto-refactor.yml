@@ -12,8 +12,9 @@ on:
   workflow_dispatch: # 手動トリガー用
 
 permissions:
-  contents: write
-  pull-requests: write
+  contents: write         # リポジトリへのファイル書き込み、コミット・プッシュに必要
+  pull-requests: write    # プルリクエスト作成・更新に必要
+  actions: read           # ワークフロー実行状況の確認に必要
 
 jobs:
   auto-refactor:
@@ -21,9 +22,10 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Set up Node.js
         uses: actions/setup-node@v3
@@ -60,11 +62,17 @@ jobs:
 - スタイル整形
 
 自動生成コミット: $(date -u +%Y-%m-%d_%H:%M:%S_UTC)"
+        env:
+          GIT_AUTHOR_NAME: "Claude Auto Refactor Bot"
+          GIT_AUTHOR_EMAIL: "bot@claude-code.dev"
+          GIT_COMMITTER_NAME: "Claude Auto Refactor Bot"
+          GIT_COMMITTER_EMAIL: "bot@claude-code.dev"
 
       - name: Create Pull Request
         if: steps.changes.outputs.has_changes == 'true'
-        uses: peter-evans/create-pull-request@v4
+        uses: peter-evans/create-pull-request@v5
         with:
+          token: ${{ secrets.GITHUB_TOKEN }}
           commit-message: 'refactor: 自動コード整理'
           title: '🤖 [Auto Refactor] 深夜コード整理 - $(date +%Y年%m月%d日)'
           body: |
