@@ -1,0 +1,91 @@
+name: Auto Refactor - Cleanup PR Generator
+
+on:
+  schedule:
+    # 毎日 UTC 15:00 (JST 00:00) に実行
+    - cron: '0 15 * * *'
+  workflow_dispatch: # 手動トリガー用
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  auto-refactor:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Configure Git
+        run: |
+          git config user.name "Claude Auto Refactor Bot"
+          git config user.email "bot@claude-code.dev"
+
+      - name: Run refactoring script
+        run: |
+          node scripts/auto-refactor.js
+
+      - name: Check if changes were made
+        id: changes
+        run: |
+          if git diff --quiet; then
+            echo "has_changes=false" >> $GITHUB_OUTPUT
+          else
+            echo "has_changes=true" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Commit and push changes
+        if: steps.changes.outputs.has_changes == 'true'
+        run: |
+          git add -A
+          git commit -m "refactor: コード冗長性削除とコード整理を自動実行
+
+- 重複コード削除
+- 変数名の統一
+- コード構造の最適化
+- スタイル整形
+
+自動生成コミット: $(date -u +%Y-%m-%d_%H:%M:%S_UTC)"
+
+      - name: Create Pull Request
+        if: steps.changes.outputs.has_changes == 'true'
+        uses: peter-evans/create-pull-request@v4
+        with:
+          commit-message: 'refactor: 自動コード整理'
+          title: '🤖 [Auto Refactor] 深夜コード整理 - $(date +%Y年%m月%d日)'
+          body: |
+            ## 🧹 自動コード整理実行
+
+            このプルリクエストは、毎日午前0時（UTC15:00）に自動実行される「Auto Refactor」スキルによって生成されました。
+
+            ### 実行内容
+            - ✅ コード冗長性削除
+            - ✅ 重複コード統合
+            - ✅ 変数命名の統一
+            - ✅ コード構造の最適化
+            - ✅ スタイル整形
+
+            ### チェック項目
+            - [ ] 変更内容を確認しました
+            - [ ] テストが通ることを確認しました
+            - [ ] マージしても問題がないことを確認しました
+
+            ---
+            **生成日時**: $(date -u '+%Y-%m-%d %H:%M:%S UTC')
+            **実行トリガー**: 定期スケジュール（毎日午前0時）
+
+            ---
+            *このPRはボットによる自動生成です。質問がある場合は、CLAUDE.md のドキュメントを参照してください。*
+          branch: auto-refactor/cleanup-${{ github.run_number }}
+          delete-branch: true
+          labels: 'automated, refactor, cleanup'
+          draft: false

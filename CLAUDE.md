@@ -17,11 +17,25 @@
 
 ```
 claude-test/
-├── CLAUDE.md          # このファイル（開発ガイド）
-├── README.md          # プロジェクト説明
-├── .gitignore         # Git除外設定
-├── .git/              # Gitリポジトリ
-└── index.html         # メインアプリケーションファイル（HTML + CSS + JS）
+├── CLAUDE.md                              # このファイル（開発ガイド）
+├── README.md                              # プロジェクト説明
+├── .gitignore                             # Git除外設定
+├── .git/                                  # Gitリポジトリ
+├── .github/workflows/
+│   └── auto-refactor.yml                  # Auto Refactor スキル（自動実行）
+├── .claude/
+│   ├── skills/
+│   │   ├── pastel-ui/                     # Pastel UI スキル
+│   │   └── auto-refactor/
+│   │       └── SKILL.md                   # Auto Refactor スキル定義
+│   ├── hooks/                             # 自動実行フック
+│   └── settings.json                      # Claude Code 設定
+├── scripts/
+│   └── auto-refactor.js                   # リファクタリング処理スクリプト
+├── tests/
+│   └── run-tests.js                       # テストスイート
+├── package.json                           # Node.js 設定
+└── index.html                             # メインアプリケーションファイル
 ```
 
 ## 技術スタック
@@ -138,6 +152,41 @@ git pull origin <branch-name>
    ```bash
    git push -u origin claude/create-claude-md-leTu3
    ```
+
+## Claude Code スキル
+
+このプロジェクトには、開発効率を向上させるカスタムスキルが含まれています。
+
+### 1. Auto Refactor スキル 🤖
+
+**概要**: 毎日午前0時（深夜）に自動実行され、コードの「散らかり」を掃除し、翌朝プルリクエストとして報告します。
+
+**機能**:
+- ✅ 毎日 UTC 15:00（JST 午前0時）に自動実行
+- ✅ コード冗長性削除
+- ✅ 重複コード統合
+- ✅ 変数命名統一
+- ✅ 自動プルリクエスト生成
+
+**ファイル**:
+- `.github/workflows/auto-refactor.yml` - ワークフロー定義
+- `scripts/auto-refactor.js` - リファクタリング処理
+- `.claude/skills/auto-refactor/SKILL.md` - スキル詳細ドキュメント
+
+**手動実行**:
+```bash
+# ローカルでテスト実行
+node scripts/auto-refactor.js
+
+# GitHub Actions で手動トリガー
+gh workflow run auto-refactor.yml
+```
+
+詳細は `.claude/skills/auto-refactor/SKILL.md` を参照してください。
+
+### 2. Pastel UI スキル
+
+別途実装されている UI デザインスキル。詳細は `.claude/skills/pastel-ui/` を参照してください。
 
 ## トラブルシューティング
 
